@@ -1,0 +1,27 @@
+---
+# defaults file for kubecluster
+modules:
+  - overlay
+  - br_netfilter
+k8s_templates:
+  - 99-kubernetes-cri:
+      src: 99-kubernetes-cri.conf
+      dest: /etc/sysctl.d/99-kubernetes-cri.conf
+  - kubernetes-repo:
+      src: kubernetes.repo
+      dest: /etc/yum.repos.d/kubernetes.repo
+  - k8sconf:
+      src: k8s.conf
+      dest: /etc/sysctl.d/k8s.conf
+  - kubelet:
+      src: kubelet
+      dest: /etc/default/kubelet
+kube_base:
+  - crio
+  - kubelet
+  - kubeadm
+  - kubectl
+crio_repo_version: paas7-crio-311-candidate
+kube_base_services:
+  - crio
+  - kubelet

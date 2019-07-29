@@ -1,0 +1,43 @@
+- name: Add the overlay module
+  modprobe:
+    name: '{{ item }}'
+    state: present
+  loop: '{{ modules }}'   
+
+- name: Put SELinux in permissive mode, logging actions that would be blocked.
+  selinux:
+    policy: targeted
+    state: permissive
+
+- name: Insert templates files
+  copy:
+    src: '{{ item.value.src }}'
+    dest: '{{ item.value.dest }}'
+    mode: 644
+    force: true
+  with_dict: '{{ k8s_templates }}'
+
+- name: Add CRI-O repository
+  yum_repository:
+    name: paas7-crio
+    description: PaaS 7 Repo
+    baseurl: https://cbs.centos.org/repos/'{{ crio_repo_version }}'/x86_64/os/
+    gpgcheck: no
+
+- name: Installing kubernetes base packages
+  yum:
+    name: '{{ kube_base }}'
+    state: present
+    #disable_gpg_check: yes
+
+- name: Loading modes
+  shell: 'sysctl --system'
+
+- name: Reload Daemon
+  systemd:
+    daemon_reload: yes
+
+- name: Start and Enable services
+  systemd:
+    name: '{{ kube_base_services }}'
+    state: restarted
