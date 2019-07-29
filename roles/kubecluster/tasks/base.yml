@@ -39,5 +39,6 @@
 
 - name: Start and Enable services
   systemd:
-    name: '{{ kube_base_services }}'
+    name: '{{ item }}'
     state: restarted
+  loop: '{{ kube_base_services }}'
