@@ -16,6 +16,9 @@ k8s_templates:
   - kubelet:
       src: kubelet
       dest: /etc/default/kubelet
+  - kubelet:
+      src: sysctl.conf
+      dest: /etc/sysctl.conf
 kube_base:
   - crio
   - kubelet

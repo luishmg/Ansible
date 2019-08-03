@@ -41,4 +41,5 @@
   systemd:
     name: '{{ item }}'
     state: restarted
+    enabled: yes
   loop: '{{ kube_base_services }}'

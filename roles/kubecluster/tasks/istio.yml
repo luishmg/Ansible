@@ -1,0 +1,8 @@
+- name: Download Istio Release
+  get_url: url=https:// dest=path
+
+- name: Execute the script
+  shell: /path
+
+- name: Remove instalador
+  FILE: path=path state=absen
