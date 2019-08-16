@@ -3,6 +3,42 @@
 modules:
   - overlay
   - br_netfilter
+config_folders:
+  - /etc/cni/net.d
+  - /opt/cni/bin
+  - /var/lib/kubelet
+  - /var/lib/kube-proxy
+  - /var/lib/kubernetes
+  - /var/run/kubernetes
+k8s_bin_dep:
+  - runc:
+      dowload: https://storage.googleapis.com/kubernetes-the-hard-way/runsc
+      dest: /root
+  - runc_amd64:
+      download: https://github.com/opencontainers/runc/releases/download/v1.0.0-rc5/runc.amd64
+      dest: /root/runc
+  - kubctl:
+      download: https://storage.googleapis.com/kubernetes-release/release/v1.10.2/bin/linux/amd64/kubectl
+      dest: /usr/local/bin/
+  - kube-proxy:
+      download: https://storage.googleapis.com/kubernetes-release/release/v1.10.2/bin/linux/amd64/kube-proxy
+      dest: /usr/local/bin/
+  - kubelet:
+      download: https://storage.googleapis.com/kubernetes-release/release/v1.10.2/bin/linux/amd64/kubelet
+      dest: /usr/local/bin/
+k8s_tars:
+  - crictl:
+      dowload: https://github.com/kubernetes-incubator/cri-tools/releases/download/v1.0.0-beta.0/crictl-v1.0.0-beta.0-linux-amd64.tar.gz
+      tar: crictl.tar.gz
+      dest: /usr/local/bin/
+  - cni:
+      dowload: https://github.com/containernetworking/plugins/releases/download/v0.6.0/cni-plugins-amd64-v0.6.0.tgz
+      tar: cni-plugins-amd64.tar.gz
+      dest: /opt/cni/bin/
+  - containerd:
+      download: https://github.com/containerd/containerd/releases/download/v1.1.0/containerd-1.1.0.linux-amd64.tar.gz
+      tar: containerd-amd64.tar.gz
+      dest: /
 k8s_templates:
   - 99-kubernetes-cri:
       src: 99-kubernetes-cri.conf
