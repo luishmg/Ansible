@@ -1,3 +1,6 @@
+- name: Turning off the swap and removing from fstab
+  shell: "swapoff -a"  # && sed -i.bak -r 's/(.+ swap .+)/#\1/' /etc/fstab
+
 - name: Add the overlay module
   modprobe:
     name: '{{ item }}'
@@ -17,18 +20,45 @@
     force: true
   with_dict: '{{ k8s_templates }}'
 
-- name: Add CRI-O repository
+- name: Add docker-ce repository
   yum_repository:
-    name: paas7-crio
-    description: PaaS 7 Repo
-    baseurl: https://cbs.centos.org/repos/'{{ crio_repo_version }}'/x86_64/os/
-    gpgcheck: no
+    name: docker-ce
+    description: YUM Docker Repo
+    baseurl: https://download.docker.com/linux/centos/docker-ce.repo
+    # gpgcheck: no
+
+- name: Installing kubernetes base packages
+  yum:
+    name: '{{ cri_dep }}'
+    state: present
+    exclude: kubernetes
+
+- name: Installing kubernetes base packages
+  yum:
+    name: '*'
+    state: latest
 
 - name: Installing kubernetes base packages
   yum:
     name: '{{ kube_base }}'
     state: present
+    exclude: kubernetes
     #disable_gpg_check: yes
+
+- name: Create the containerd directory
+  file:
+    path: /etc/containerd
+    state: directory
+    mode: '0755'
+
+- name: Generating the default containerd config
+  shell: 'containerd config default > /etc/containerd/config.toml'
+
+- name: Replace after the expression till the end of the file (requires Ansible >= 2.4)
+  replace:
+    path: /etc/containerd/config.toml
+    regexp: '^(.*systemd_cgroup).+$'
+    replace: '\1 = true'
 
 - name: Loading modes
   shell: 'sysctl --system'
@@ -43,3 +73,4 @@
     state: restarted
     enabled: yes
   loop: '{{ kube_base_services }}'
+

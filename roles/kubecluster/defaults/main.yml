@@ -19,12 +19,16 @@ k8s_templates:
   - kubelet:
       src: sysctl.conf
       dest: /etc/sysctl.conf
+cri_dep:
+  - yum-utils
+  - device-mapper-persistent-data
+  - lvm2
 kube_base:
-  - crio
+  - containerd.io
   - kubelet
   - kubeadm
   - kubectl
 crio_repo_version: paas7-crio-311-candidate
 kube_base_services:
-  - crio
+  - containerd.io
   - kubelet
