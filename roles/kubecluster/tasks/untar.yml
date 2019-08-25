@@ -1,0 +1,17 @@
+- debug:
+    msg: 'Installing {{ file.key }}'
+
+- name: Download containerd tar files
+  get_url:
+    url: '{{ file.value.download }}'
+    dest: '{{ file.value.tar }}'
+    mode: 755
+
+- name: Extract containerd files
+  unarchive:
+    src: '{{ file.value.tar }}'
+    dest: '{{ file.value.untar }}'
+    remote_src: true
+
+- name: Copy files to the proper locations
+  shell: 'cp {{ file.value.untar }}{{ file.value.subfolders }}/* {{ file.value.dest }}'

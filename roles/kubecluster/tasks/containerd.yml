@@ -1,0 +1,37 @@
+- name: Installing containerd dependencies
+  yum:
+    name: '{{ containerd_dep }}'
+    state: latest
+
+- name: Create the containerd directory
+  file:
+    path: '{{ item }}'
+    state: directory
+    mode: '0755'
+  loop: '{{ config_folders }}'
+
+- name: Inserting containerd config files
+  template:
+    src: '{{ item.value.src }}'
+    dest: '{{ item.value.dest }}'
+    mode: 755
+    force: true
+  with_dict: '{{ containerd_tpl }}'
+
+- name: Download containerd binary files
+  get_url:
+    url: '{{ item.value.download }}'
+    dest: '{{ item.value.dest }}'
+    mode: 755
+  with_dict: '{{ containerd_binaries }}'
+
+
+- include: untar.yml file={{ item }}
+  with_dict: '{{ containerd_tar_files }}'
+  when: containerd_tar_files is defined
+
+- name: Restart and enable containerd
+  systemd:
+    name: 'containerd'
+    state: restarted
+    enabled: yes
